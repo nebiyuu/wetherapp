@@ -3,14 +3,15 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  return runApp(MaterialApp(home: MyApp()));
+  runApp(MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -20,15 +21,20 @@ class _MyAppState extends State<MyApp> {
   Map<String, dynamic> data = {};
 
   Future<void> fetcherr() async {
-    final response = await http.get(Uri.parse(
-        'https://api.open-meteo.com/v1/forecast?latitude=9.025&longitude=38.7469&current=temperature_2m,rain&timezone=Europe%2FMoscow'));
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.open-meteo.com/v1/forecast?latitude=9.025&longitude=38.7469&daily=temperature_2m_max&wind_speed_unit=ms&timezone=Europe%2FMoscow'));
 
-    if (response.statusCode == 200) {
-      setState(() {
-        data = jsonDecode(response.body);
-      });
-    } else {
-      throw Exception('Failed to load data');
+      if (response.statusCode == 200) {
+        setState(() {
+          data = jsonDecode(response.body);
+          print('Data fetched successfully: $data');
+        });
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
     }
   }
 
@@ -47,28 +53,34 @@ class _MyAppState extends State<MyApp> {
             image: AssetImage("assets/sky.jpg"),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-                Colors.blue.withOpacity(0.3), BlendMode.darken)),
+                Colors.blue.withOpacity(0.0), BlendMode.darken)),
       ),
       child: ListView.builder(
-          itemCount: 1,
+          itemCount: data['daily']['temperature_2m_max'].length,
+          scrollDirection: Axis.horizontal,
           itemBuilder: (BuildContext context, index) {
+            double temp = data['daily']['temperature_2m_max'][index];
             return Stack(children: [
               Center(
-                child: ListTile(
-                    title: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(179, 194, 193, 193),
-                        borderRadius: BorderRadius.circular(20)),
-                    height: 125,
-                    child: Center(
-                      child: Text(
-                        'Temperature: ${data['current']['temperature_2m']} °C',
+                child: data.isEmpty
+                    ? Center(child: CircularProgressIndicator())
+                    : SizedBox(
+                        width: 300,
+                        child: ListTile(
+                          title: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromARGB(179, 255, 255, 255)
+                                    .withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(20)),
+                            height: 300,
+                            child: Center(
+                              child: Text(
+                                'Temperature: $temp  °C',
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                )),
               )
             ]);
           }),
