@@ -1,17 +1,13 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:convert';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(MaterialApp(home: MyApp()));
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -50,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         body: Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: AssetImage("assets/sky.jpg"),
+            image: const AssetImage("assets/sky.jpg"),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.blue.withOpacity(0.0), BlendMode.darken)),
@@ -60,22 +56,23 @@ class _MyAppState extends State<MyApp> {
           scrollDirection: Axis.horizontal,
           itemBuilder: (BuildContext context, index) {
             double temp = data['daily']['temperature_2m_max'][index];
+            String date = data['daily']['time'][index];
             return Stack(children: [
               Center(
                 child: data.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
                         width: 300,
                         child: ListTile(
                           title: Container(
                             decoration: BoxDecoration(
-                                color: Color.fromARGB(179, 255, 255, 255)
+                                color: const Color.fromARGB(179, 255, 255, 255)
                                     .withOpacity(0.4),
                                 borderRadius: BorderRadius.circular(20)),
                             height: 300,
                             child: Center(
                               child: Text(
-                                'Temperature: $temp  °C',
+                                'Temperature: $temp  °C\n  date : $date',
                               ),
                             ),
                           ),
