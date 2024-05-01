@@ -1,17 +1,16 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: avoid_print, unused_local_variable
 
 import 'dart:convert';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 void main() {
-  runApp(MaterialApp(home: MyApp()));
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -28,13 +27,13 @@ class _MyAppState extends State<MyApp> {
       if (response.statusCode == 200) {
         setState(() {
           data = jsonDecode(response.body);
-          print('Data fetched successfully: $data');
+          print('Data fetched successfully: ');
         });
       } else {
         throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching data: $e');
+      print('Error fetching data: ');
     }
   }
 
@@ -44,13 +43,35 @@ class _MyAppState extends State<MyApp> {
     fetcherr();
   }
 
+  String getDayOfWeek(String dateString) {
+    List<String> dateParts = dateString.split('-');
+    int year = int.parse(dateParts[0]);
+    int month = int.parse(dateParts[1]);
+    int day = int.parse(dateParts[2]);
+
+    DateTime dateTime = DateTime(year, month, day);
+
+    List<String> weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    return weekdays[dateTime.weekday - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+
     return Scaffold(
         body: Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: AssetImage("assets/sky.jpg"),
+            image: const AssetImage("assets/sky.jpg"),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.blue.withOpacity(0.0), BlendMode.darken)),
@@ -60,24 +81,24 @@ class _MyAppState extends State<MyApp> {
           scrollDirection: Axis.horizontal,
           itemBuilder: (BuildContext context, index) {
             double temp = data['daily']['temperature_2m_max'][index];
+            String datt = data['daily']['time'][index];
+
             return Stack(children: [
               Center(
                 child: data.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
                         width: 300,
                         child: ListTile(
                           title: Container(
                             decoration: BoxDecoration(
-                                color: Color.fromARGB(179, 255, 255, 255)
+                                color: const Color.fromARGB(179, 255, 255, 255)
                                     .withOpacity(0.4),
                                 borderRadius: BorderRadius.circular(20)),
                             height: 300,
                             child: Center(
-                              child: Text(
-                                'Temperature: $temp  °C',
-                              ),
-                            ),
+                                child: Text(
+                                    ' ${getDayOfWeek(datt)} \n   Temperature: $temp  °C  ')),
                           ),
                         ),
                       ),
