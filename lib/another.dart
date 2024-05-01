@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MyWetherApp extends StatefulWidget {
-  const MyWetherApp({super.key});
+  const MyWetherApp({Key? key}) : super(key: key);
 
   @override
   State<MyWetherApp> createState() => _MyWetherAppState();
@@ -14,11 +14,12 @@ class MyWetherApp extends StatefulWidget {
 
 class _MyWetherAppState extends State<MyWetherApp> {
   Map<String, dynamic> mydata = {};
-
+  double x = 9.025;
+  double y = 38.7469;
   void fetcherr() async {
     try {
       final ress = await http.get(Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=9.025&longitude=38.7469&current=temperature_2m,is_day,rain&timezone=Europe%2FMoscow'));
+          'https://api.open-meteo.com/v1/forecast?latitude=$x&longitude=$y&current=temperature_2m,is_day,rain&timezone=Europe%2FMoscow'));
       if (ress.statusCode == 200) {
         setState(() {
           mydata = jsonDecode(ress.body);
